@@ -76,13 +76,13 @@ int main(int argc,char** argv) {
                 throw std::runtime_error("Two local MPI ranks selected the same GPU; fix device visibility/binding");
         mpi_check(MPI_Comm_free(&local));
 #endif
-        // Use C stdio for per-rank diagnostics: remote MPI ranks crashed in
-        // libstdc++ while constructing an ostream sentry on the Vanda nodes.
+         
+         
         std::printf("rank=%d gpu=%s pci_bus=%s local_rows=%d first_row=%d\n",
                     rank,prop.name,bus,n,qfirst);
         std::fflush(stdout);
         int status=0;
-        // Destroy CUDA allocations/handles before finalizing MPI.
+         
         {
             auto q=generate<float>(o.seed,elements(qfirst,o.d),elements(n,o.d));
             auto k=generate<float>(o.seed,nd+elements(qfirst,o.d),elements(n,o.d));
@@ -91,7 +91,7 @@ int main(int argc,char** argv) {
             Device<float> kv(kv_capacity);
             GpuAttention engine(o,n,qfirst,q);
             auto iteration=[&]() {
-                // Input construction and synchronization barrier excluded from timing.
+                 
                 std::copy(k.begin(),k.end(),a.ptr);
                 std::copy(v.begin(),v.end(),a.ptr+k.size());
                 cuda_check(cudaDeviceSynchronize());
@@ -126,7 +126,7 @@ int main(int argc,char** argv) {
                 engine.finish();time.total=seconds()-start;
                 return time;
             };
-            iteration(); // warm-up, including the MPI ring
+            iteration();  
             std::vector<double> totals,uploads,computes,comms;
             for(int rep=0;rep<o.repeats;++rep) {
                 auto t=iteration();

@@ -22,7 +22,7 @@ struct Blas {
     cublasHandle_t h=nullptr;
     Blas() {
         blas_check(cublasCreate(&h));
-        // Keep FP32 arithmetic; do not silently use reduced-mantissa TF32.
+         
         blas_check(cublasSetMathMode(h,CUBLAS_PEDANTIC_MATH));
     }
     ~Blas() {if(h)cublasDestroy(h);}
@@ -31,8 +31,8 @@ __global__ void init_state(float* m,float* l,int n) {
     int i=blockIdx.x*blockDim.x+threadIdx.x;
     if(i<n) {m[i]=-CUDART_INF_F;l[i]=0;}
 }
-// One block per query row. Convert scores to exp(score-new_max), rescale
-// the old unnormalized output, and update the online denominator.
+ 
+ 
 __global__ void online_weights(float* s,float* out,float* m,float* l,
         int nq,int nk,int dv,int qfirst,int kfirst,bool causal) {
     int row=blockIdx.x,t=threadIdx.x;
@@ -95,7 +95,7 @@ public:
             for(int ki=0;ki<nk_total;) {
                 int nk=std::min(o.bk,nk_total-ki);
                 const float scale=1.0f/std::sqrt(static_cast<float>(o.d)),zero=0,one=1;
-                // Row-major Q K^T, interpreted as its column-major transpose.
+                 
                 blas_check(cublasSgemm(blas.h,CUBLAS_OP_T,CUBLAS_OP_N,nk,nq,o.d,
                     &scale,k+static_cast<std::size_t>(ki)*o.d,o.d,
                     q.ptr+static_cast<std::size_t>(qi)*o.d,o.d,&zero,s.ptr,nk));

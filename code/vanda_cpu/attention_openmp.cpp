@@ -166,7 +166,7 @@ int main(int argc, char** argv) {
             std::string extra;
             if (in >> extra) throw std::runtime_error("Unexpected extra input data");
         }
-        attention(q, k, v, out, o, o.threads); // warm-up
+        attention(q, k, v, out, o, o.threads);  
         std::vector<double> times;
         for (std::size_t r = 0; r < o.repeats; ++r) {
             const auto start = std::chrono::steady_clock::now();

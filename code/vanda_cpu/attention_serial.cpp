@@ -11,8 +11,8 @@
 #include <string>
 #include <vector>
 
-// FP64 reference: O = softmax(Q K^T / sqrt(d)) V.
-// Row-major matrices; one head, batch size one, no dropout or bias.
+ 
+ 
 struct Options {
     std::size_t n = 256, d = 64, dv = 64, repeats = 3;
     std::uint64_t seed = 42;
@@ -68,7 +68,7 @@ Options parse(int argc, char** argv) {
     return o;
 }
 
-// SplitMix64 with explicitly defined conversion, reproducible across C++ runtimes.
+ 
 double sample(std::uint64_t& state) {
     state += UINT64_C(0x9e3779b97f4a7c15);
     auto z = state;
@@ -110,7 +110,7 @@ void attention(const std::vector<double>& q, const std::vector<double>& k,
         if (!std::isfinite(x)) throw std::runtime_error("Non-finite output");
 }
 
-// Closed-form cases exercise uniform softmax, scaling, mask and stable softmax.
+ 
 void self_check() {
     Options o;
     o.n = 3; o.d = 2; o.dv = 2;
@@ -137,7 +137,7 @@ void self_check() {
     attention(q, k, {0, 1}, out, scratch, o);
     close(out[0], 1.0 / (1.0 + std::exp(-1.0)));
     close(out[1], out[0]);
-    // exp(1000) would overflow without subtracting the row maximum.
+     
     k = {1000 * std::sqrt(2.0), 0, 1001 * std::sqrt(2.0), 0};
     attention(q, k, {0, 1}, out, scratch, o);
     close(out[0], 1.0 / (1.0 + std::exp(-1.0)));
@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
             std::string extra;
             if (in >> extra) throw std::runtime_error("Unexpected extra input data");
         }
-        // Allocation, input generation, warm-up and output are excluded from timing.
+         
         attention(q, k, v, out, scores, o);
         std::vector<double> times;
         for (std::size_t r = 0; r < o.repeats; ++r) {

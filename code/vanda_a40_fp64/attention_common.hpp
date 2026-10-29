@@ -63,7 +63,7 @@ inline double sample(std::uint64_t& state) {
     z^=z>>31;
     return 2.0*(static_cast<double>(z>>11)/9007199254740992.0)-1.0;
 }
-// Jump directly into the serial generator's Q, K or V stream.
+ 
 template<class T> inline std::vector<T> generate(std::uint64_t seed,
         std::uint64_t offset,std::size_t count) {
     auto state=seed+UINT64_C(0x9e3779b97f4a7c15)*offset;
@@ -75,7 +75,7 @@ inline int rows(int n,int p,int rank) {return n/p+(rank<n%p);}
 inline int first(int n,int p,int rank) {return rank*(n/p)+std::min(rank,n%p);}
 inline std::vector<double> reference(const Options& o) {
     const auto nd=elements(o.n,o.d),nv=elements(o.n,o.dv);
-    // Round inputs to FP32 first: compare arithmetic, not different input values.
+     
     auto q=generate<double>(o.seed,0,nd);
     auto k=generate<double>(o.seed,nd,nd);
     auto v=generate<double>(o.seed,2*static_cast<std::uint64_t>(nd),nv);
